@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timbre Automático con Arduino | Proyecto Escolar</title>
+    <style>
+        /* ----------------------- CSS: Estilos de la Página ----------------------- */
+        :root {
+            --color-principal: #3498db; /* Azul Colegio */
+            --color-secundario: #2ecc71; /* Verde Tecnología */
+            --color-fondo: #ecf0f1;
+            --color-texto: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 3px solid var(--color-principal);
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            color: var(--color-principal);
+            font-size: 2.2em;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: var(--color-secundario);
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--color-secundario);
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+
+        /* Estilos de la tabla de componentes */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9em;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--color-principal);
+            color: white;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+        
+        /* Estilos para el bloque de código */
+        .codigo-bloque {
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            overflow-x: auto; /* Permite desplazamiento horizontal en pantallas pequeñas */
+        }
+        
+        pre {
+            margin: 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+            white-space: pre-wrap; /* Mantiene saltos de línea y formato */
+            display: block;
+        }
+
+        .explicacion-simple {
+            background-color: #e8f6f3; /* Fondo de explicación */
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid var(--color-secundario);
+        }
+        .explicacion-simple p {
+            margin: 0 0 10px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔔 Timbre Escolar Automático y Alarma de Emergencia con Arduino</h1>
+            <p>Proyecto de Automatización y Seguridad Escolar | Por: Juan Diego</p>
+        </header>
+
+        <section>
+            <h2>💡 Resumen e Impacto</h2>
+            <p>Este sistema de timbre inteligente utiliza una placa **Arduino** para controlar los horarios con precisión. El objetivo es eliminar los retrasos del timbre manual para mejorar la **puntualidad** y, fundamentalmente, añadir un botón de **emergencia** para alertar rápidamente a toda la comunidad educativa. ¡Demostramos que la electrónica puede solucionar problemas reales!</p>
+        </section>
+
+        <section>
+            <h2>⚙️ Componentes Clave del Sistema</h2>
+            <p>El proyecto es viable gracias a estos módulos electrónicos:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Componente</th>
+                        <th>Función Principal</th>
+                        <th>Rol en el Proyecto (Explicación Simple)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>**Arduino UNO**</td>
+                        <td>Microcontrolador</td>
+                        <td>Es el **cerebro** del proyecto. Ejecuta las instrucciones (el código) para controlar todo.</td>
+                    </tr>
+                    <tr>
+                        <td>**Módulo RTC DS3231**</td>
+                        <td>Reloj en Tiempo Real</td>
+                        <td>Mantiene la **hora exacta** siempre, incluso si se va la luz, para garantizar la precisión.</td>
+                    </tr>
+                    <tr>
+                        <td>**Módulo Relé**</td>
+                        <td>Interruptor Eléctrico</td>
+                        <td>Permite que el Arduino active (encienda) la **campana o sirena** del colegio a la hora precisa.</td>
+                    </tr>
+                    <tr>
+                        <td>**Pantalla LCD I2C**</td>
+                        <td>Interfaz Visual</td>
+                        <td>Muestra la **hora actual** y el estado del sistema ("Esperando" o "Sonando").</td>
+                    </tr>
+                    <tr>
+                        <td>**Microinterruptor**</td>
+                        <td>Alarma Manual</td>
+                        <td>El **botón de emergencia** que activa la alarma sonora en caso de cualquier riesgo.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>💻 Código Fuente (Sketch de Arduino)</h2>
+            <p>Este código está cargado en el Arduino. Lo dividimos en bloques para entender su lógica.</p>
+
+            <h3>1. Librerías y Conexiones</h3>
+            <p>Se define el hardware que se utilizará, como el Pin 8 para el Relé y el Pin 2 para el botón de Alarma.</p>
+            <div class="codigo-bloque">
+<pre><code>
+// ---------------------- 1. LIBRERÍAS Y DEFINICIONES ----------------------
+#include &lt;Wire.h&gt; 
+#include &lt;LiquidCrystal_I2C.h&gt; 
+#include "RTClib.h" 
+
+// Definiciones de hardware
+#define PIN_RELE 8           // SALIDA al Timbre
+#define PIN_ALARMA_MANUAL 2  // ENTRADA del botón de Emergencia
+
+// Inicialización de objetos
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+RTC_DS3231 rtc;                     
+
+// Horarios Programados (Hora, Minuto)
+int horarios_timbre[][2] = {
+    {7, 0},    // Entrada
+    {9, 30},   // Receso
+    {12, 30}   // Salida
+};
+const int NUM_TIMBRES = sizeof(horarios_timbre) / sizeof(horarios_timbre[0]);
+</code></pre>
+            </div>
+
+            <h3>2. Función Principal: `loop()` (El Motor del Proyecto)</h3>
+            <p>El Arduino repite esta parte sin parar. Aquí se toman las decisiones.</p>
+            <div class="codigo-bloque">
+<pre><code>
+// ---------------------- 2. EL MOTOR DEL PROYECTO (LOOP) ----------------------
+void loop() {
+    DateTime ahora = rtc.now(); // Pide la hora actual
+    int horaActual = ahora.hour();
+    int minutoActual = ahora.minute();
+
+    // --- A. REVISIÓN DE ALARMA MANUAL (Prioridad Alta) ---
+    if (digitalRead(PIN_ALARMA_MANUAL) == LOW) {
+        activarTimbre(4); // Toca el timbre por 4 segundos para la ALARMA
+        
+        // Muestra la alerta
+        lcd.clear();
+        lcd.print("!!! ALARMA ACTIVA !!!");
+        lcd.setCursor(0, 1);
+        lcd.print("ALARMA MANUAL (4s)");
+        delay(100);
+    }
+
+    // --- B. REVISIÓN DE HORARIO AUTOMÁTICO ---
+    else {
+        bool timbreProgramado = false;
+        // Recorre la lista de horarios para ver si ya es hora
+        for (int i = 0; i < NUM_TIMBRES; i++) {
+            if (horaActual == horarios_timbre[i][0] && minutoActual == horarios_timbre[i][1]) {
+                activarTimbre(2); // Toca el timbre por 2 segundos (rutina normal)
+                timbreProgramado = true;
+                break; 
+            }
+        }
+
+        // --- C. MOSTRAR LA HORA EN PANTALLA ---
+        if (!timbreProgramado) {
+            lcd.setCursor(0, 0);
+            lcd.print("Hora: ");
+            if (horaActual < 10) lcd.print("0");
+            lcd.print(horaActual);
+            lcd.print(":");
+            if (minutoActual < 10) lcd.print("0");
+            lcd.print(minutoActual);
+
+            lcd.setCursor(0, 1);
+            lcd.print("Estado: Esperando");
+        }
+    }
+    
+    delay(900); // Pausa de 0.9 segundos
+}
+</code></pre>
+            </div>
+            
+            <h3>3. Función Auxiliar: `activarTimbre()`</h3>
+            <p>Esta es la instrucción que el Arduino ejecuta para encender el Relé.</p>
+            <div class="codigo-bloque">
+<pre><code>
+// ---------------------- 3. FUNCIÓN AUXILIAR ----------------------
+void activarTimbre(int duracionSegundos) {
+    digitalWrite(PIN_RELE, HIGH); // Activar Relé (Timbre ENCIENDE)
+    
+    // Muestra que está sonando
+    lcd.clear();
+    lcd.print("!! TIMBRE SONANDO !!");
+    lcd.setCursor(0, 1);
+    lcd.print("Duracion: ");
+    lcd.print(duracionSegundos);
+    lcd.print("s");
+    
+    delay(duracionSegundos * 1000); // Espera el tiempo de la duración
+    
+    digitalWrite(PIN_RELE, LOW); // Desactivar Relé (Timbre APAGA)
+}
+</code></pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>📖 ¿Cómo Funciona la Magia? (Analogía Simple)</h2>
+            <div class="explicacion-simple">
+                <p>El Arduino actúa como un **vigilante** o **controlador** muy rápido que sigue un protocolo simple:</p>
+                <ul>
+                    <li>**"¿Qué hora es?"** El vigilante pregunta la hora al **RTC (Reloj)**.</li>
+                    <li>**"¿Alguien presionó el botón rojo?"** El vigilante revisa el **Microinterruptor (Alarma Manual)**. Si está presionado, ¡suena la alarma inmediatamente, sin importar la hora!</li>
+                    <li>**"¿Toca timbre automático?"** Si no hay alarma, revisa su **lista de horarios** programados.</li>
+                    <li>**"¡Activar!"** Si coincide la hora, le da la orden al **Relé** de encender y apagar el timbre real.</li>
+                    <li>**"Todo OK."** Si no hay nada que hacer, simplemente muestra la hora en el **LCD**.</li>
+                </ul>
+            </div>
+        </section>
+        
+        <footer style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd;">
+            <p style="font-size: 0.9em; color: #7f8c8d;">Proyecto de Tecnología y Electrónica - Fomentando el Aprendizaje Práctico.</p>
+        </footer>
+    </div>
+</body>
+</html>
